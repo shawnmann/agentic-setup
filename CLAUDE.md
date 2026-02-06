@@ -8,19 +8,21 @@ A task/todo web application built with Vue 3 and Vite. Frontend-only with localS
 - **Build tool:** Vite
 - **Styling:** Plain CSS (no UI library)
 - **Storage:** localStorage
-- **Testing:** Vitest (when added)
+- **Testing:** Vitest with jsdom environment
 
 ## Commands
 - `npm run dev` — Start dev server
 - `npm run build` — Production build
 - `npm run preview` — Preview production build
-- `npm test` — Run tests (when configured)
+- `npm test` — Run tests once (Vitest)
+- `npm run test:watch` — Run tests in watch mode
 
 ## Project Structure
 ```
 src/
   components/    # Vue components
   stores/        # Reactive state management
+    __tests__/   # Unit tests (Vitest)
   App.vue        # Root component
   main.js        # Entry point
   style.css      # Global styles

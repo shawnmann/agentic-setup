@@ -54,3 +54,32 @@
 - Centered single-column layout with max-width
 - Comfortable padding and spacing on mobile and desktop
 - No horizontal scrolling on any screen size
+
+## F11: Unit Tests (Vitest)
+
+### Setup
+- Use Vitest as the test runner
+- Test file location: `src/stores/__tests__/todoStore.test.js`
+- Add `npm test` script to `package.json`
+- Mock `localStorage` in the test environment (jsdom)
+
+### Store Action Tests
+- **addTodo:** adds a task with correct shape (id, text, completed: false, createdAt)
+- **addTodo:** ignores empty string and whitespace-only input
+- **removeTodo:** removes a task by id
+- **removeTodo:** does nothing if id doesn't exist
+- **toggleTodo:** flips completed from false to true and back
+- **editTodo:** updates the text of an existing task
+- **editTodo:** trims whitespace from the new text
+- **editTodo:** deletes the task if new text is empty
+- **clearCompleted:** removes all completed tasks, keeps active ones
+
+### Computed Property Tests
+- **filteredTodos:** returns all tasks when filter is 'all'
+- **filteredTodos:** returns only incomplete tasks when filter is 'active'
+- **filteredTodos:** returns only completed tasks when filter is 'completed'
+- **activeCount:** returns the number of incomplete tasks
+- **hasCompleted:** returns true when at least one task is completed, false otherwise
+
+### Filter Action Test
+- **setFilter:** changes the filter value between 'all', 'active', 'completed'

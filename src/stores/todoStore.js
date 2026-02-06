@@ -69,6 +69,12 @@ function setFilter(value) {
   filter.value = value
 }
 
+function _reset() {
+  todos.value = []
+  filter.value = 'all'
+  localStorage.removeItem(STORAGE_KEY)
+}
+
 export function useTodoStore() {
   return {
     todos,
@@ -81,6 +87,7 @@ export function useTodoStore() {
     toggleTodo,
     editTodo,
     clearCompleted,
-    setFilter
+    setFilter,
+    _reset
   }
 }
