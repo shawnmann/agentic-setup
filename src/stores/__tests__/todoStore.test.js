@@ -15,8 +15,14 @@ describe('addTodo', () => {
     const todo = store.todos.value[0]
     expect(todo.text).toBe('Buy groceries')
     expect(todo.completed).toBe(false)
+    expect(todo.priority).toBe(null)
     expect(todo.id).toBeDefined()
     expect(todo.createdAt).toBeDefined()
+  })
+
+  it('adds a task with priority when provided', () => {
+    store.addTodo('Urgent task', 'high')
+    expect(store.todos.value[0].priority).toBe('high')
   })
 
   it('ignores empty string input', () => {
@@ -156,5 +162,69 @@ describe('setFilter', () => {
 
     store.setFilter('all')
     expect(store.filter.value).toBe('all')
+  })
+})
+
+describe('setPriority', () => {
+  it('changes priority on an existing task', () => {
+    store.addTodo('Task')
+    const id = store.todos.value[0].id
+    store.setPriority(id, 'high')
+    expect(store.todos.value[0].priority).toBe('high')
+  })
+
+  it('setting to null makes task unprioritized', () => {
+    store.addTodo('Task', 'medium')
+    const id = store.todos.value[0].id
+    store.setPriority(id, null)
+    expect(store.todos.value[0].priority).toBe(null)
+  })
+})
+
+describe('setPriorityFilter', () => {
+  it('changes the priority filter value', () => {
+    store.setPriorityFilter('high')
+    expect(store.priorityFilter.value).toBe('high')
+
+    store.setPriorityFilter('none')
+    expect(store.priorityFilter.value).toBe('none')
+
+    store.setPriorityFilter('all')
+    expect(store.priorityFilter.value).toBe('all')
+  })
+})
+
+describe('filteredTodos with priority', () => {
+  beforeEach(() => {
+    store.addTodo('High task', 'high')
+    store.addTodo('Medium task', 'medium')
+    store.addTodo('Low task', 'low')
+    store.addTodo('No priority task')
+  })
+
+  it('filters by high priority', () => {
+    store.setPriorityFilter('high')
+    expect(store.filteredTodos.value).toHaveLength(1)
+    expect(store.filteredTodos.value[0].text).toBe('High task')
+  })
+
+  it('filters by none (unprioritized)', () => {
+    store.setPriorityFilter('none')
+    expect(store.filteredTodos.value).toHaveLength(1)
+    expect(store.filteredTodos.value[0].text).toBe('No priority task')
+  })
+
+  it('combines status and priority filters', () => {
+    store.toggleTodo(store.todos.value[0].id)
+    store.setFilter('active')
+    store.setPriorityFilter('medium')
+    expect(store.filteredTodos.value).toHaveLength(1)
+    expect(store.filteredTodos.value[0].text).toBe('Medium task')
+  })
+
+  it('sorts by priority then creation date', () => {
+    store.setPriorityFilter('all')
+    const texts = store.filteredTodos.value.map(t => t.text)
+    expect(texts).toEqual(['High task', 'Medium task', 'Low task', 'No priority task'])
   })
 })
