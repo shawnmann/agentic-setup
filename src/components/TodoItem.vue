@@ -1,11 +1,13 @@
 <script setup>
 import { ref, nextTick } from 'vue'
 
+const PRIORITY_CYCLE = [null, 'high', 'medium', 'low']
+
 const props = defineProps({
   todo: { type: Object, required: true }
 })
 
-const emit = defineEmits(['toggle', 'remove', 'edit'])
+const emit = defineEmits(['toggle', 'remove', 'edit', 'set-priority'])
 
 const editing = ref(false)
 const editText = ref('')
@@ -25,6 +27,17 @@ function saveEdit() {
 function cancelEdit() {
   editing.value = false
 }
+
+function cyclePriority() {
+  const currentIndex = PRIORITY_CYCLE.indexOf(props.todo.priority ?? null)
+  const nextIndex = (currentIndex + 1) % PRIORITY_CYCLE.length
+  emit('set-priority', props.todo.id, PRIORITY_CYCLE[nextIndex])
+}
+
+function priorityLabel(priority) {
+  if (!priority) return null
+  return priority.charAt(0).toUpperCase()
+}
 </script>
 
 <template>
@@ -36,6 +49,14 @@ function cancelEdit() {
         :checked="todo.completed"
         @change="emit('toggle', todo.id)"
       />
+      <button
+        class="priority-badge"
+        :class="todo.priority ? `priority-${todo.priority}` : 'priority-none'"
+        @click="cyclePriority"
+        title="Click to change priority"
+      >
+        {{ priorityLabel(todo.priority) || '–' }}
+      </button>
       <span class="todo-text" @dblclick="startEdit">{{ todo.text }}</span>
       <button class="btn-edit" @click="startEdit" title="Edit">&#9998;</button>
       <button class="btn-delete" @click="emit('remove', todo.id)" title="Delete">&times;</button>
@@ -76,6 +97,43 @@ function cancelEdit() {
   accent-color: var(--color-accent);
   cursor: pointer;
   flex-shrink: 0;
+}
+
+.priority-badge {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.priority-badge.priority-high {
+  border-color: var(--color-priority-high);
+  color: var(--color-priority-high);
+}
+
+.priority-badge.priority-medium {
+  border-color: var(--color-priority-medium);
+  color: var(--color-priority-medium);
+}
+
+.priority-badge.priority-low {
+  border-color: var(--color-priority-low);
+  color: var(--color-priority-low);
+}
+
+.priority-badge.priority-none {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .todo-text {

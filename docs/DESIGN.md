@@ -6,10 +6,10 @@ Single-page todo application. All state lives in a reactive JavaScript store and
 ## Component Tree
 ```
 App.vue
-├── AddTodo.vue        # Text input + submit button
-├── FilterBar.vue      # Filter buttons (All/Active/Completed) + clear completed + task count
+├── AddTodo.vue        # Text input + priority selector + submit button
+├── FilterBar.vue      # Status filters, priority filters, clear completed, task count
 └── TodoList.vue
-    └── TodoItem.vue   # Individual task: checkbox, label, edit, delete
+    └── TodoItem.vue   # Individual task: checkbox, priority badge, label, edit, delete
 ```
 
 ## Data Model
@@ -20,6 +20,7 @@ App.vue
   id: crypto.randomUUID(),  // unique string ID
   text: 'Buy groceries',    // task description
   completed: false,          // boolean status
+  priority: null,            // null | 'high' | 'medium' | 'low'
   createdAt: Date.now()      // timestamp for ordering
 }
 ```
@@ -27,8 +28,9 @@ App.vue
 ### Store State
 ```js
 {
-  todos: [],        // Array<Todo> — the full list
-  filter: 'all'     // 'all' | 'active' | 'completed'
+  todos: [],              // Array<Todo> — the full list
+  filter: 'all',          // 'all' | 'active' | 'completed'
+  priorityFilter: 'all'   // 'all' | 'high' | 'medium' | 'low' | 'none'
 }
 ```
 

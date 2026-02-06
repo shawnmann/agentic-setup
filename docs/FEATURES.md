@@ -55,6 +55,57 @@
 - Comfortable padding and spacing on mobile and desktop
 - No horizontal scrolling on any screen size
 
+## F12: Task Priority
+
+### Priority Values
+- `null` — Unprioritized (default for new tasks)
+- `'high'` — High priority
+- `'medium'` — Medium priority
+- `'low'` — Low priority
+
+### Data Model Change
+- Add `priority` field to todo items: `priority: null | 'high' | 'medium' | 'low'`
+- Existing todos without a `priority` field are treated as unprioritized (`null`)
+
+### Adding a Task with Priority
+- The AddTodo form includes an optional priority selector (dropdown or button group)
+- Default selection is "None" (unprioritized)
+- User can pick High, Medium, or Low before adding
+- Priority resets to "None" after each task is added
+
+### Displaying Priority
+- Each TodoItem shows a colored priority badge/indicator next to the task text
+- High = red, Medium = yellow, Low = blue, Unprioritized = no badge
+- Priority badge is compact and does not dominate the task row
+
+### Editing Priority
+- Clicking the priority badge on a TodoItem cycles through: None → High → Medium → Low → None
+- Priority changes persist immediately (same as other mutations)
+
+### Filtering by Priority
+- Add a second row of filter buttons: All, High, Medium, Low, None
+- This filter works independently of the status filter (All/Active/Completed)
+- Both filters apply simultaneously (e.g., "Active" + "High" shows only incomplete high-priority tasks)
+- Default priority filter on page load is "All"
+
+### Sorting
+- Within the current filter view, tasks are ordered by priority first (High → Medium → Low → None), then by creation date
+- This is a display-time sort — it does not change the stored order
+
+### Store Changes
+- Add `priorityFilter` state: `'all' | 'high' | 'medium' | 'low' | 'none'`
+- Add `setPriorityFilter(value)` action
+- Add `setPriority(id, priority)` action
+- Update `filteredTodos` computed to apply both status and priority filters, then sort
+
+### Unit Tests (add to existing test file)
+- **addTodo:** new tasks have `priority: null` by default
+- **setPriority:** changes priority on an existing task
+- **setPriority:** setting to `null` makes task unprioritized
+- **filteredTodos:** priority filter returns only matching tasks
+- **filteredTodos:** status and priority filters combine correctly
+- **setPriorityFilter:** changes the priority filter value
+
 ## F11: Unit Tests (Vitest)
 
 ### Setup

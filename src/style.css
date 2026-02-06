@@ -6,6 +6,9 @@
   --color-text: #eee;
   --color-text-muted: #999;
   --color-border: #333;
+  --color-priority-high: #e94560;
+  --color-priority-medium: #f0c040;
+  --color-priority-low: #4ea8de;
   --radius: 8px;
   --max-width: 560px;
 
