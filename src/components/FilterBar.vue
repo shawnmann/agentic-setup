@@ -1,46 +1,84 @@
 <script setup>
 import { useTodoStore } from '../stores/todoStore'
 
-const { filter, activeCount, hasCompleted, setFilter, clearCompleted } = useTodoStore()
+const {
+  filter, priorityFilter, activeCount, hasCompleted,
+  setFilter, setPriorityFilter, clearCompleted
+} = useTodoStore()
 
-const filters = ['all', 'active', 'completed']
+const statusFilters = ['all', 'active', 'completed']
+const priorityFilters = [
+  { value: 'all', label: 'All' },
+  { value: 'high', label: 'High' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'low', label: 'Low' },
+  { value: 'none', label: 'None' }
+]
 </script>
 
 <template>
   <div class="filter-bar">
-    <span class="task-count">{{ activeCount }} item{{ activeCount === 1 ? '' : 's' }} left</span>
-    <div class="filter-buttons">
+    <div class="filter-row">
+      <span class="task-count">{{ activeCount }} item{{ activeCount === 1 ? '' : 's' }} left</span>
+      <div class="filter-buttons">
+        <button
+          v-for="f in statusFilters"
+          :key="f"
+          :class="{ active: filter === f }"
+          @click="setFilter(f)"
+        >
+          {{ f.charAt(0).toUpperCase() + f.slice(1) }}
+        </button>
+      </div>
       <button
-        v-for="f in filters"
-        :key="f"
-        :class="{ active: filter === f }"
-        @click="setFilter(f)"
+        v-if="hasCompleted"
+        class="btn-clear"
+        @click="clearCompleted"
       >
-        {{ f.charAt(0).toUpperCase() + f.slice(1) }}
+        Clear completed
       </button>
     </div>
-    <button
-      v-if="hasCompleted"
-      class="btn-clear"
-      @click="clearCompleted"
-    >
-      Clear completed
-    </button>
+    <div class="filter-row priority-row">
+      <span class="filter-label">Priority:</span>
+      <div class="filter-buttons">
+        <button
+          v-for="p in priorityFilters"
+          :key="p.value"
+          :class="[
+            { active: priorityFilter === p.value },
+            p.value !== 'all' && p.value !== 'none' ? `priority-filter-${p.value}` : ''
+          ]"
+          @click="setPriorityFilter(p.value)"
+        >
+          {{ p.label }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .filter-bar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.25rem;
   padding: 0.75rem 0;
   font-size: 0.875rem;
 }
 
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .task-count {
+  color: var(--color-text-muted);
+}
+
+.filter-label {
   color: var(--color-text-muted);
 }
 
@@ -59,6 +97,21 @@ const filters = ['all', 'active', 'completed']
 .filter-buttons button.active {
   border-color: var(--color-accent);
   color: var(--color-text);
+}
+
+.filter-buttons button.active.priority-filter-high {
+  border-color: var(--color-priority-high);
+  color: var(--color-priority-high);
+}
+
+.filter-buttons button.active.priority-filter-medium {
+  border-color: var(--color-priority-medium);
+  color: var(--color-priority-medium);
+}
+
+.filter-buttons button.active.priority-filter-low {
+  border-color: var(--color-priority-low);
+  color: var(--color-priority-low);
 }
 
 .filter-buttons button:hover {

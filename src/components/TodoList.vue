@@ -2,7 +2,7 @@
 import { useTodoStore } from '../stores/todoStore'
 import TodoItem from './TodoItem.vue'
 
-const { filteredTodos, toggleTodo, removeTodo, editTodo } = useTodoStore()
+const { filteredTodos, toggleTodo, removeTodo, editTodo, setPriority } = useTodoStore()
 </script>
 
 <template>
@@ -14,6 +14,7 @@ const { filteredTodos, toggleTodo, removeTodo, editTodo } = useTodoStore()
       @toggle="toggleTodo"
       @remove="removeTodo"
       @edit="editTodo"
+      @set-priority="setPriority"
     />
   </ul>
   <p class="empty-state" v-else>No tasks to show.</p>
