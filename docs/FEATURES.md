@@ -1,0 +1,56 @@
+# Feature Specifications
+
+## F1: Add a Task
+- Text input field with placeholder "What needs to be done?"
+- Submit on Enter key or click an Add button
+- Empty/whitespace-only input is ignored (no empty tasks)
+- Input is cleared after successful add
+- New tasks are added to the end of the list with `completed: false`
+
+## F2: Display Task List
+- Render all tasks matching the current filter
+- Each task shows: checkbox, task text, edit button, delete button
+- Tasks are displayed in creation order (oldest first)
+- When no tasks match the filter, show a simple empty state message
+
+## F3: Toggle Task Completion
+- Clicking the checkbox toggles `completed` between true/false
+- Completed tasks display with strikethrough text and muted styling
+
+## F4: Edit a Task
+- Clicking the edit button (or double-clicking the task text) enters edit mode
+- Edit mode replaces the label with a text input pre-filled with the current text
+- Pressing Enter or blurring the input saves the change
+- Pressing Escape cancels the edit
+- Saving empty text deletes the task
+
+## F5: Delete a Task
+- Clicking the delete button removes the task immediately
+- No confirmation dialog (keep it simple)
+
+## F6: Filter Tasks
+- Three filter buttons: All, Active, Completed
+- Active filter is visually highlighted
+- "All" shows every task
+- "Active" shows only tasks where `completed === false`
+- "Completed" shows only tasks where `completed === true`
+- Default filter on page load is "All"
+
+## F7: Clear Completed
+- Button labeled "Clear completed"
+- Removes all tasks where `completed === true`
+- Only visible when there is at least one completed task
+
+## F8: Task Count
+- Display "{n} items left" showing the count of active (incomplete) tasks
+- Updates reactively as tasks are added, completed, or deleted
+
+## F9: Persistence
+- All tasks are saved to localStorage on every change
+- On page load, tasks are restored from localStorage
+- App works correctly even if localStorage is empty (first visit)
+
+## F10: Responsive Layout
+- Centered single-column layout with max-width
+- Comfortable padding and spacing on mobile and desktop
+- No horizontal scrolling on any screen size
