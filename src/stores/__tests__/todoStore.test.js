@@ -16,6 +16,7 @@ describe('addTodo', () => {
     expect(todo.text).toBe('Buy groceries')
     expect(todo.completed).toBe(false)
     expect(todo.priority).toBe(null)
+    expect(todo.categoryId).toBe(null)
     expect(todo.id).toBeDefined()
     expect(todo.createdAt).toBeDefined()
   })
@@ -23,6 +24,13 @@ describe('addTodo', () => {
   it('adds a task with priority when provided', () => {
     store.addTodo('Urgent task', 'high')
     expect(store.todos.value[0].priority).toBe('high')
+  })
+
+  it('adds a task with category when provided', () => {
+    store.addCategory('Work')
+    const catId = store.categories.value[0].id
+    store.addTodo('Work task', null, catId)
+    expect(store.todos.value[0].categoryId).toBe(catId)
   })
 
   it('ignores empty string input', () => {
@@ -226,5 +234,113 @@ describe('filteredTodos with priority', () => {
     store.setPriorityFilter('all')
     const texts = store.filteredTodos.value.map(t => t.text)
     expect(texts).toEqual(['High task', 'Medium task', 'Low task', 'No priority task'])
+  })
+})
+
+describe('addCategory', () => {
+  it('creates a category with id, name, and color', () => {
+    store.addCategory('Work')
+    expect(store.categories.value).toHaveLength(1)
+
+    const cat = store.categories.value[0]
+    expect(cat.name).toBe('Work')
+    expect(cat.id).toBeDefined()
+    expect(cat.color).toBeDefined()
+  })
+
+  it('rejects empty names', () => {
+    const result = store.addCategory('   ')
+    expect(result).toBe(false)
+    expect(store.categories.value).toHaveLength(0)
+  })
+
+  it('rejects duplicate names (case-insensitive)', () => {
+    store.addCategory('Work')
+    const result = store.addCategory('work')
+    expect(result).toBe(false)
+    expect(store.categories.value).toHaveLength(1)
+  })
+})
+
+describe('removeCategory', () => {
+  it('removes a category and unsets it from tasks', () => {
+    store.addCategory('Work')
+    const catId = store.categories.value[0].id
+    store.addTodo('Task', null, catId)
+
+    store.removeCategory(catId)
+    expect(store.categories.value).toHaveLength(0)
+    expect(store.todos.value[0].categoryId).toBe(null)
+  })
+})
+
+describe('setTaskCategory', () => {
+  it('assigns a category to a task', () => {
+    store.addCategory('Personal')
+    const catId = store.categories.value[0].id
+    store.addTodo('Task')
+    const todoId = store.todos.value[0].id
+
+    store.setTaskCategory(todoId, catId)
+    expect(store.todos.value[0].categoryId).toBe(catId)
+  })
+
+  it('setting to null makes task uncategorized', () => {
+    store.addCategory('Work')
+    const catId = store.categories.value[0].id
+    store.addTodo('Task', null, catId)
+    const todoId = store.todos.value[0].id
+
+    store.setTaskCategory(todoId, null)
+    expect(store.todos.value[0].categoryId).toBe(null)
+  })
+})
+
+describe('setCategoryFilter', () => {
+  it('changes the category filter value', () => {
+    store.setCategoryFilter('uncategorized')
+    expect(store.categoryFilter.value).toBe('uncategorized')
+
+    store.setCategoryFilter('all')
+    expect(store.categoryFilter.value).toBe('all')
+  })
+})
+
+describe('filteredTodos with categories', () => {
+  let workId
+
+  beforeEach(() => {
+    store.addCategory('Work')
+    store.addCategory('Personal')
+    workId = store.categories.value[0].id
+    const personalId = store.categories.value[1].id
+
+    store.addTodo('Work task', null, workId)
+    store.addTodo('Personal task', null, personalId)
+    store.addTodo('No category task')
+  })
+
+  it('filters by a specific category', () => {
+    store.setCategoryFilter(workId)
+    expect(store.filteredTodos.value).toHaveLength(1)
+    expect(store.filteredTodos.value[0].text).toBe('Work task')
+  })
+
+  it('filters by uncategorized', () => {
+    store.setCategoryFilter('uncategorized')
+    expect(store.filteredTodos.value).toHaveLength(1)
+    expect(store.filteredTodos.value[0].text).toBe('No category task')
+  })
+
+  it('combines status, priority, and category filters', () => {
+    store.addTodo('High work task', 'high', workId)
+    store.toggleTodo(store.todos.value[0].id)
+
+    store.setFilter('active')
+    store.setPriorityFilter('high')
+    store.setCategoryFilter(workId)
+
+    expect(store.filteredTodos.value).toHaveLength(1)
+    expect(store.filteredTodos.value[0].text).toBe('High work task')
   })
 })
