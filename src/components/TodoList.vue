@@ -2,7 +2,10 @@
 import { useTodoStore } from '../stores/todoStore'
 import TodoItem from './TodoItem.vue'
 
-const { filteredTodos, toggleTodo, removeTodo, editTodo, setPriority } = useTodoStore()
+const {
+  filteredTodos, categories, toggleTodo,
+  removeTodo, editTodo, setPriority, setTaskCategory
+} = useTodoStore()
 </script>
 
 <template>
@@ -11,10 +14,12 @@ const { filteredTodos, toggleTodo, removeTodo, editTodo, setPriority } = useTodo
       v-for="todo in filteredTodos"
       :key="todo.id"
       :todo="todo"
+      :categories="categories"
       @toggle="toggleTodo"
       @remove="removeTodo"
       @edit="editTodo"
       @set-priority="setPriority"
+      @set-category="setTaskCategory"
     />
   </ul>
   <p class="empty-state" v-else>No tasks to show.</p>

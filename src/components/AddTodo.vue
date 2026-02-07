@@ -2,9 +2,10 @@
 import { ref } from 'vue'
 import { useTodoStore } from '../stores/todoStore'
 
-const { addTodo } = useTodoStore()
+const { addTodo, categories } = useTodoStore()
 const newText = ref('')
 const newPriority = ref(null)
+const newCategoryId = ref(null)
 
 const priorities = [
   { value: null, label: 'None' },
@@ -14,9 +15,10 @@ const priorities = [
 ]
 
 function handleSubmit() {
-  addTodo(newText.value, newPriority.value)
+  addTodo(newText.value, newPriority.value, newCategoryId.value)
   newText.value = ''
   newPriority.value = null
+  newCategoryId.value = null
 }
 </script>
 
@@ -28,20 +30,32 @@ function handleSubmit() {
       placeholder="What needs to be done?"
       autofocus
     />
-    <div class="priority-select">
-      <button
-        v-for="p in priorities"
-        :key="p.label"
-        type="button"
-        class="priority-option"
-        :class="[
-          p.value ? `priority-${p.value}` : 'priority-none',
-          { selected: newPriority === p.value }
-        ]"
-        @click="newPriority = p.value"
+    <div class="add-options">
+      <div class="priority-select">
+        <button
+          v-for="p in priorities"
+          :key="p.label"
+          type="button"
+          class="priority-option"
+          :class="[
+            p.value ? `priority-${p.value}` : 'priority-none',
+            { selected: newPriority === p.value }
+          ]"
+          @click="newPriority = p.value"
+        >
+          {{ p.label }}
+        </button>
+      </div>
+      <select
+        v-if="categories.length"
+        v-model="newCategoryId"
+        class="category-select"
       >
-        {{ p.label }}
-      </button>
+        <option :value="null">No category</option>
+        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+          {{ cat.name }}
+        </option>
+      </select>
     </div>
     <button type="submit" class="btn-add">Add</button>
   </form>
@@ -54,9 +68,16 @@ function handleSubmit() {
   gap: 0.5rem;
 }
 
-.add-todo input {
+.add-todo input[type="text"] {
   flex: 1;
   min-width: 0;
+}
+
+.add-options {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .priority-select {
@@ -93,6 +114,22 @@ function handleSubmit() {
 
 .priority-option.priority-none.selected {
   border-color: var(--color-text-muted);
+}
+
+.category-select {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.3em 0.5em;
+  font-size: 0.75rem;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+.category-select:focus {
+  border-color: var(--color-accent);
 }
 
 .btn-add {

@@ -2,8 +2,9 @@
 import { useTodoStore } from '../stores/todoStore'
 
 const {
-  filter, priorityFilter, activeCount, hasCompleted,
-  setFilter, setPriorityFilter, clearCompleted
+  filter, priorityFilter, categoryFilter, categories,
+  activeCount, hasCompleted,
+  setFilter, setPriorityFilter, setCategoryFilter, clearCompleted
 } = useTodoStore()
 
 const statusFilters = ['all', 'active', 'completed']
@@ -38,7 +39,7 @@ const priorityFilters = [
         Clear completed
       </button>
     </div>
-    <div class="filter-row priority-row">
+    <div class="filter-row">
       <span class="filter-label">Priority:</span>
       <div class="filter-buttons">
         <button
@@ -51,6 +52,33 @@ const priorityFilters = [
           @click="setPriorityFilter(p.value)"
         >
           {{ p.label }}
+        </button>
+      </div>
+    </div>
+    <div class="filter-row" v-if="categories.length">
+      <span class="filter-label">Category:</span>
+      <div class="filter-buttons">
+        <button
+          :class="{ active: categoryFilter === 'all' }"
+          @click="setCategoryFilter('all')"
+        >
+          All
+        </button>
+        <button
+          :class="{ active: categoryFilter === 'uncategorized' }"
+          @click="setCategoryFilter('uncategorized')"
+        >
+          None
+        </button>
+        <button
+          v-for="cat in categories"
+          :key="cat.id"
+          :class="{ active: categoryFilter === cat.id }"
+          :style="categoryFilter === cat.id ? { borderColor: cat.color, color: cat.color } : {}"
+          @click="setCategoryFilter(cat.id)"
+        >
+          <span class="cat-filter-dot" :style="{ background: cat.color }"></span>
+          {{ cat.name }}
         </button>
       </div>
     </div>
@@ -85,6 +113,7 @@ const priorityFilters = [
 .filter-buttons {
   display: flex;
   gap: 0.25rem;
+  flex-wrap: wrap;
 }
 
 .filter-buttons button {
@@ -92,6 +121,9 @@ const priorityFilters = [
   color: var(--color-text-muted);
   padding: 0.3em 0.75em;
   border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .filter-buttons button.active {
@@ -116,6 +148,13 @@ const priorityFilters = [
 
 .filter-buttons button:hover {
   color: var(--color-text);
+}
+
+.cat-filter-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .btn-clear {

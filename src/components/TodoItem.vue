@@ -1,17 +1,23 @@
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 
 const PRIORITY_CYCLE = [null, 'high', 'medium', 'low']
 
 const props = defineProps({
-  todo: { type: Object, required: true }
+  todo: { type: Object, required: true },
+  categories: { type: Array, default: () => [] }
 })
 
-const emit = defineEmits(['toggle', 'remove', 'edit', 'set-priority'])
+const emit = defineEmits(['toggle', 'remove', 'edit', 'set-priority', 'set-category'])
 
 const editing = ref(false)
 const editText = ref('')
 const editInput = ref(null)
+const showCatDropdown = ref(false)
+
+const category = computed(() =>
+  props.categories.find(c => c.id === props.todo.categoryId)
+)
 
 function startEdit() {
   editing.value = true
@@ -38,6 +44,11 @@ function priorityLabel(priority) {
   if (!priority) return null
   return priority.charAt(0).toUpperCase()
 }
+
+function selectCategory(categoryId) {
+  emit('set-category', props.todo.id, categoryId)
+  showCatDropdown.value = false
+}
 </script>
 
 <template>
@@ -57,6 +68,33 @@ function priorityLabel(priority) {
       >
         {{ priorityLabel(todo.priority) || '–' }}
       </button>
+      <div class="category-wrapper" v-if="categories.length">
+        <button
+          class="category-label"
+          @click="showCatDropdown = !showCatDropdown"
+          title="Click to change category"
+        >
+          <span
+            class="cat-dot"
+            :style="{ background: category ? category.color : 'transparent', border: category ? 'none' : '1px dashed var(--color-border)' }"
+          ></span>
+          <span class="cat-text">{{ category ? category.name : '—' }}</span>
+        </button>
+        <div v-if="showCatDropdown" class="cat-dropdown">
+          <button class="cat-option" @click="selectCategory(null)">
+            None
+          </button>
+          <button
+            v-for="cat in categories"
+            :key="cat.id"
+            class="cat-option"
+            @click="selectCategory(cat.id)"
+          >
+            <span class="cat-dot" :style="{ background: cat.color }"></span>
+            {{ cat.name }}
+          </button>
+        </div>
+      </div>
       <span class="todo-text" @dblclick="startEdit">{{ todo.text }}</span>
       <button class="btn-edit" @click="startEdit" title="Edit">&#9998;</button>
       <button class="btn-delete" @click="emit('remove', todo.id)" title="Delete">&times;</button>
@@ -134,6 +172,73 @@ function priorityLabel(priority) {
 .priority-badge.priority-none {
   border-color: var(--color-border);
   color: var(--color-text-muted);
+}
+
+.category-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.category-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  padding: 0.15em 0.4em;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.category-label:hover {
+  border-color: var(--color-text-muted);
+}
+
+.cat-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.cat-text {
+  max-width: 5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cat-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.25rem 0;
+  min-width: 8rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cat-option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  background: none;
+  color: var(--color-text);
+  font-size: 0.8rem;
+  padding: 0.4em 0.75em;
+  border-radius: 0;
+  text-align: left;
+}
+
+.cat-option:hover {
+  background: var(--color-surface);
+  opacity: 1;
 }
 
 .todo-text {
