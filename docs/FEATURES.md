@@ -106,6 +106,68 @@
 - **filteredTodos:** status and priority filters combine correctly
 - **setPriorityFilter:** changes the priority filter value
 
+## F13: Task Categories
+
+### Category Data Model
+- Categories are stored as a separate array in the store and localStorage
+- Each category has: `{ id, name, color }`
+- `color` is a random hex color assigned automatically when the category is created
+- Categories are persisted under a separate localStorage key: `vue-todo-app-categories`
+
+### Task Data Model Change
+- Add `categoryId` field to todo items: `categoryId: null | string`
+- `null` means the task is uncategorized
+- A task belongs to at most one category
+
+### Category Management UI
+- New component: `CategoryManager.vue`, accessible via a "Manage Categories" button in the app
+- Displays a list of all categories with their color swatch and name
+- **Create:** text input + "Add" button to create a new category (auto-assigned random color)
+- **Delete:** delete button on each category; deleting a category sets `categoryId: null` on all tasks that used it
+- Empty/whitespace-only names are ignored
+- Duplicate category names are not allowed
+
+### Assigning a Category to a Task
+- Each TodoItem shows a small colored dot/label for its category (or nothing if uncategorized)
+- Clicking the category label opens a dropdown with all available categories + "None"
+- Selecting a category updates the task immediately
+- The AddTodo form includes an optional category dropdown (default: "None")
+- Category selection resets to "None" after each task is added
+
+### Color Assignment
+- When a category is created, assign a random color from a curated palette of distinguishable colors
+- Colors should be visually distinct from the priority colors (red, yellow, blue)
+- The color is fixed once assigned (no manual color picking)
+
+### Filtering by Category
+- Add a third filter row in FilterBar: shows "All", "Uncategorized", plus a button for each category
+- Category filter works independently of status and priority filters
+- All three filters apply simultaneously (e.g., "Active" + "High" + "Work")
+- Default category filter on page load is "All"
+- Category filter buttons show the category color as a dot or border accent
+
+### Store Changes
+- Add `categories` ref: `Array<{ id, name, color }>`
+- Add `categoryFilter` state: `'all' | 'uncategorized' | <categoryId>`
+- Add `addCategory(name)` action — generates id + random color, rejects empty/duplicate names
+- Add `removeCategory(id)` action — removes category and unsets it from all tasks
+- Add `setTaskCategory(todoId, categoryId)` action
+- Add `setCategoryFilter(value)` action
+- Update `filteredTodos` computed to apply category filter alongside status and priority filters
+- Persist categories to localStorage under `vue-todo-app-categories`
+
+### Unit Tests (add to existing test file)
+- **addCategory:** creates a category with id, name, and color
+- **addCategory:** rejects empty names
+- **addCategory:** rejects duplicate names
+- **removeCategory:** removes a category and unsets it from tasks that used it
+- **setTaskCategory:** assigns a category to a task
+- **setTaskCategory:** setting to null makes task uncategorized
+- **filteredTodos:** category filter returns only matching tasks
+- **filteredTodos:** "uncategorized" filter returns only tasks with no category
+- **filteredTodos:** all three filters (status, priority, category) combine correctly
+- **setCategoryFilter:** changes the category filter value
+
 ## F11: Unit Tests (Vitest)
 
 ### Setup
